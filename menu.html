@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Menu - La Compagnie Repo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #111;
+      color: #fff;
+    }
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .menu-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      justify-items: center;
+      margin-bottom: 30px;
+    }
+    .item {
+      background: #222;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #0005;
+      text-align: center;
+      width: 200px;
+    }
+    button {
+      background: #8a2be2;
+      border: none;
+      padding: 10px 15px;
+      margin-top: 10px;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #9d4fff;
+    }
+    #cart li {
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>La Compagnie Repo</h1>
+
+  <h2>Cocktails Virgin</h2>
+  <div class="menu-container">
+    <div class="item"><h3>Virgin Mojito</h3><button onclick="addToCart('Virgin Mojito')">Ajouter</button></div>
+    <div class="item"><h3>Virgin Mojito Fraise</h3><button onclick="addToCart('Virgin Mojito Fraise')">Ajouter</button></div>
+    <div class="item"><h3>Virgin Cosmopolitain</h3><button onclick="addToCart('Virgin Cosmopolitain')">Ajouter</button></div>
+    <div class="item"><h3>Virgin Pina Colada</h3><button onclick="addToCart('Virgin Pina Colada')">Ajouter</button></div>
+    <div class="item"><h3>Virgin Sunrise</h3><button onclick="addToCart('Virgin Sunrise')">Ajouter</button></div>
+  </div>
+
+  <h2>Softs & Eaux</h2>
+  <div class="menu-container">
+    <div class="item"><h3>Coca</h3><button onclick="addToCart('Coca')">Ajouter</button></div>
+    <div class="item"><h3>Fuze Tea</h3><button onclick="addToCart('Fuze Tea')">Ajouter</button></div>
+    <div class="item"><h3>St Pelligrino</h3><button onclick="addToCart('St Pelligrino')">Ajouter</button></div>
+    <div class="item"><h3>Eau plate</h3><button onclick="addToCart('Eau plate')">Ajouter</button></div>
+  </div>
+
+  <h2>Panier</h2>
+  <ul id="cart"></ul>
+
+  <form id="orderForm" action="https://formspree.io/f/meoykbgb" method="POST">
+    <input type="hidden" name="commande" id="orderData">
+    <input type="hidden" name="_redirect" value="menu.html">
+    <button type="submit" onclick="prepareOrder()">Envoyer la commande</button>
+  </form>
+
+  <script>
+    const discordWebhook = "https://discord.com/api/webhooks/1445831449629425664/7RdKKkH92U9EolkTlx3u-OhuNR4w_UXlr9jj_s4M38FYqctpZqSMkMle6hwPj5O4KrOY";
+
+    let cart = [];
+
+    function addToCart(item) {
+        cart.push(item);
+        updateCartDisplay();
+    }
+
+    function updateCartDisplay() {
+        const cartList = document.getElementById("cart");
+        cartList.innerHTML = "";
+        cart.forEach((item, index) => {
+            cartList.innerHTML += `<li>${item} <button onclick="removeFromCart(${index})">X</button></li>`;
+        });
+    }
+
+    function removeFromCart(index) {
+        cart.splice(index, 1);
+        updateCartDisplay();
+    }
+
+    function prepareOrder() {
+        const input = document.getElementById("orderData");
+        input.value = JSON.stringify(cart);
+
+        // Envoi vers Discord
+        const fields = cart.map(item => `• ${item}`).join("\n");
+        fetch(discordWebhook, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                content: `📩 Nouvelle commande reçue !\n${fields}`
+            })
+        });
+    }
+  </script>
+
+</body>
+</html>
